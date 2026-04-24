@@ -3,12 +3,1931 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>klar-restaurant</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <title>Maison Aurèle — Fine Dining</title>
+
+    <!-- Fonts: Distinctive choices — no Inter, no generic serifs -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=Geist+Mono&display=swap"
+      rel="stylesheet">
+
+    <style>
+      /* ============================================
+           CSS CUSTOM PROPERTIES — DESIGN TOKENS
+           ============================================ */
+      :root {
+        /* Color Palette — Dark, warm, luxurious */
+        --canvas-deep: #0F0F0E;
+        --canvas-mid: #161615;
+        --canvas-elevated: #1C1C1A;
+        --surface-glass: rgba(255, 255, 255, 0.04);
+        --surface-glass-hover: rgba(255, 255, 255, 0.07);
+        --surface-glass-border: rgba(255, 255, 255, 0.08);
+        --surface-glass-border-hover: rgba(255, 255, 255, 0.14);
+
+        --text-primary: #F5F0E8;
+        --text-secondary: #A8A29E;
+        --text-tertiary: #78716C;
+        --text-accent: #D4A574;
+
+        /* Single accent — warm amber/copper, under 80% saturation */
+        --accent-warm: #D4A574;
+        --accent-warm-muted: rgba(212, 165, 116, 0.15);
+        --accent-warm-glow: rgba(212, 165, 116, 0.06);
+
+        /* Shadows — warm-tinted, never harsh */
+        --shadow-diffused: 0 20px 60px -15px rgba(0, 0, 0, 0.5);
+        --shadow-card: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
+        --shadow-elevated: 0 32px 80px -20px rgba(0, 0, 0, 0.6);
+
+        /* Typography scale */
+        --font-display: 'Instrument Serif', serif;
+        --font-body: 'Outfit', sans-serif;
+        --font-mono: 'Geist Mono', monospace;
+
+        /* Spacing */
+        --section-gap: clamp(4rem, 10vw, 8rem);
+        --container-max: 1400px;
+        --container-pad: clamp(1.25rem, 4vw, 4rem);
+
+        /* Glass effect */
+        --glass-blur: 24px;
+        --glass-radius: 1.5rem;
+      }
+
+      /* ============================================
+           RESET & BASE
+           ============================================ */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        font-family: var(--font-body);
+        font-weight: 400;
+        color: var(--text-primary);
+        background-color: var(--canvas-deep);
+        line-height: 1.65;
+        overflow-x: hidden;
+      }
+
+      /* Noise texture overlay for depth */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* ============================================
+           UTILITY — CONTAINER
+           ============================================ */
+      .aurele-container {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding-left: var(--container-pad);
+        padding-right: var(--container-pad);
+      }
+
+      /* ============================================
+           SECTION LABEL — SHARED STYLE
+           ============================================ */
+      .aurele-section-label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent-warm);
+        margin-bottom: 1rem;
+      }
+
+      .aurele-section-heading {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 4.5vw, 3.5rem);
+        font-weight: 400;
+        line-height: 1.15;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+      }
+
+      /* ============================================
+           GLASS CARD — REUSABLE COMPONENT
+           ============================================ */
+      .aurele-glass-card {
+        background: var(--surface-glass);
+        backdrop-filter: blur(var(--glass-blur));
+        -webkit-backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--surface-glass-border);
+        border-radius: var(--glass-radius);
+        padding: 2rem;
+        transition: background 0.4s ease, border-color 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-glass-card:hover {
+        background: var(--surface-glass-hover);
+        border-color: var(--surface-glass-border-hover);
+      }
+
+      /* ============================================
+           SCROLL REVEAL ANIMATION
+           ============================================ */
+      .aurele-reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-reveal.aurele-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Staggered children */
+      .aurele-stagger>* {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-stagger.aurele-visible>* {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ============================================
+           NAVIGATION — STICKY GLASS NAV
+           ============================================ */
+      .aurele-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 1.25rem 0;
+        transition: background 0.5s ease, backdrop-filter 0.5s ease;
+      }
+
+      .aurele-nav.aurele-nav-scrolled {
+        background: rgba(15, 15, 14, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--surface-glass-border);
+      }
+
+      .aurele-nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .aurele-nav-logo {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        color: var(--text-primary);
+        letter-spacing: 0.02em;
+      }
+
+      .aurele-nav-logo span {
+        color: var(--accent-warm);
+      }
+
+      .aurele-nav-links {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+      }
+
+      .aurele-nav-links a {
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        letter-spacing: 0.03em;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .aurele-nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--accent-warm);
+        transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-nav-links a:hover {
+        color: var(--text-primary);
+      }
+
+      .aurele-nav-links a:hover::after {
+        width: 100%;
+      }
+
+      /* Mobile menu toggle */
+      .aurele-nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .aurele-nav-toggle span {
+        display: block;
+        width: 24px;
+        height: 1.5px;
+        background: var(--text-primary);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+
+      .aurele-nav-toggle.aurele-toggle-active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 4px);
+      }
+
+      .aurele-nav-toggle.aurele-toggle-active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .aurele-nav-toggle.aurele-toggle-active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -4px);
+      }
+
+      /* Mobile menu overlay */
+      .aurele-mobile-menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 15, 14, 0.95);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        z-index: 99;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5rem;
+      }
+
+      .aurele-mobile-menu.aurele-menu-open {
+        display: flex;
+      }
+
+      .aurele-mobile-menu a {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        color: var(--text-primary);
+        transition: color 0.3s ease;
+      }
+
+      .aurele-mobile-menu a:hover {
+        color: var(--accent-warm);
+      }
+
+      /* ============================================
+           HERO SECTION — FULLSCREEN, ASYMMETRIC
+           ============================================ */
+      .aurele-hero {
+        min-height: 100dvh;
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* Background ambient gradient */
+      .aurele-hero::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 70%;
+        height: 120%;
+        background: radial-gradient(ellipse at center, var(--accent-warm-glow) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .aurele-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: clamp(6rem, 12vw, 10rem) var(--container-pad);
+        padding-left: clamp(2rem, 8vw, 8rem);
+      }
+
+      .aurele-hero-tagline {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent-warm);
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: aurele-fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+      }
+
+      .aurele-hero-title {
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 7vw, 6.5rem);
+        line-height: 1.05;
+        font-weight: 400;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        opacity: 0;
+        animation: aurele-fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+      }
+
+      .aurele-hero-title em {
+        font-style: italic;
+        color: var(--accent-warm);
+      }
+
+      .aurele-hero-subtitle {
+        font-size: 1.0625rem;
+        color: var(--text-secondary);
+        max-width: 38ch;
+        line-height: 1.7;
+        margin-bottom: 2.5rem;
+        opacity: 0;
+        animation: aurele-fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
+      }
+
+      .aurele-hero-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2.25rem;
+        background: var(--accent-warm);
+        color: var(--canvas-deep);
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        border: none;
+        border-radius: 100px;
+        cursor: pointer;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+        opacity: 0;
+        animation: aurele-fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+      }
+
+      .aurele-hero-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px -8px rgba(212, 165, 116, 0.3);
+      }
+
+      .aurele-hero-cta:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .aurele-hero-cta svg {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+      }
+
+      .aurele-hero-cta:hover svg {
+        transform: translateX(3px);
+      }
+
+      /* Hero image side */
+      .aurele-hero-visual {
+        position: relative;
+        height: 100%;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+      }
+
+      .aurele-hero-image-wrapper {
+        position: relative;
+        width: 85%;
+        max-width: 520px;
+        aspect-ratio: 3/4;
+        border-radius: 2rem;
+        overflow: hidden;
+        opacity: 0;
+        animation: aurele-scaleIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+      }
+
+      .aurele-hero-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Decorative frame around hero image */
+      .aurele-hero-image-wrapper::after {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border: 1px solid var(--surface-glass-border);
+        border-radius: 2.25rem;
+        pointer-events: none;
+      }
+
+      /* Floating badge on hero */
+      .aurele-hero-badge {
+        position: absolute;
+        bottom: 6rem;
+        left: -2rem;
+        z-index: 3;
+        opacity: 0;
+        animation: aurele-fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
+      }
+
+      .aurele-hero-badge-inner {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--surface-glass-border);
+        border-radius: 1.25rem;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .aurele-hero-badge-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--accent-warm-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-warm);
+        font-size: 1.25rem;
+      }
+
+      .aurele-hero-badge-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .aurele-hero-badge-text strong {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .aurele-hero-badge-text span {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      /* ============================================
+           ABOUT SECTION
+           ============================================ */
+      .aurele-about {
+        padding: var(--section-gap) 0;
+      }
+
+      .aurele-about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .aurele-about-text p {
+        font-size: 1.0625rem;
+        color: var(--text-secondary);
+        line-height: 1.75;
+        max-width: 52ch;
+        margin-bottom: 1.25rem;
+      }
+
+      .aurele-about-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+      }
+
+      .aurele-stat-card {
+        text-align: center;
+        padding: 1.75rem 1rem;
+      }
+
+      .aurele-stat-number {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 3.5vw, 3rem);
+        color: var(--accent-warm);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+
+      .aurele-stat-label {
+        font-size: 0.8125rem;
+        color: var(--text-tertiary);
+        letter-spacing: 0.03em;
+      }
+
+      .aurele-about-image {
+        border-radius: 2rem;
+        overflow: hidden;
+        aspect-ratio: 4/5;
+      }
+
+      .aurele-about-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-about-image:hover img {
+        transform: scale(1.04);
+      }
+
+      /* ============================================
+           MENU SECTION
+           ============================================ */
+      .aurele-menu {
+        padding: var(--section-gap) 0;
+        position: relative;
+      }
+
+      /* Ambient background glow */
+      .aurele-menu::before {
+        content: '';
+        position: absolute;
+        top: 20%;
+        left: -15%;
+        width: 50%;
+        height: 60%;
+        background: radial-gradient(ellipse, var(--accent-warm-glow) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .aurele-menu-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 3.5rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .aurele-menu-filters {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .aurele-filter-btn {
+        padding: 0.625rem 1.25rem;
+        font-family: var(--font-body);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        background: transparent;
+        border: 1px solid var(--surface-glass-border);
+        border-radius: 100px;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-filter-btn:hover {
+        color: var(--text-primary);
+        border-color: var(--surface-glass-border-hover);
+      }
+
+      .aurele-filter-btn.aurele-filter-active {
+        background: var(--accent-warm);
+        color: var(--canvas-deep);
+        border-color: var(--accent-warm);
+      }
+
+      .aurele-menu-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        position: relative;
+      }
+
+      .aurele-dish-card {
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease, border-color 0.4s ease;
+      }
+
+      .aurele-dish-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .aurele-dish-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 1rem;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .aurele-dish-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-dish-card:hover .aurele-dish-image img {
+        transform: scale(1.12);
+      }
+
+      .aurele-dish-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .aurele-dish-name {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        color: var(--text-primary);
+      }
+
+      .aurele-dish-desc {
+        font-size: 0.875rem;
+        color: var(--text-tertiary);
+        line-height: 1.5;
+      }
+
+      .aurele-dish-tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        color: var(--accent-warm);
+        background: var(--accent-warm-muted);
+        padding: 0.2rem 0.6rem;
+        border-radius: 100px;
+        margin-top: 0.25rem;
+        width: fit-content;
+      }
+
+      .aurele-dish-price {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        color: var(--accent-warm);
+        white-space: nowrap;
+        align-self: start;
+        margin-top: 0.25rem;
+      }
+
+      /* Hidden dishes for filtering */
+      .aurele-dish-card.aurele-dish-hidden {
+        display: none;
+      }
+
+      /* ============================================
+           GALLERY SECTION
+           ============================================ */
+      .aurele-gallery {
+        padding: var(--section-gap) 0;
+      }
+
+      .aurele-gallery-header {
+        margin-bottom: 3rem;
+      }
+
+      .aurele-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto auto;
+        gap: 1rem;
+      }
+
+      /* Asymmetric bento layout */
+      .aurele-gallery-item:nth-child(1) {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+
+      .aurele-gallery-item {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 1;
+      }
+
+      .aurele-gallery-item:nth-child(1) {
+        aspect-ratio: auto;
+      }
+
+      .aurele-gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-gallery-item:hover img {
+        transform: scale(1.06);
+      }
+
+      /* Glass overlay on hover */
+      .aurele-gallery-item::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(15, 15, 14, 0.5) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+      }
+
+      .aurele-gallery-item:hover::after {
+        opacity: 1;
+      }
+
+      /* ============================================
+           CONTACT SECTION
+           ============================================ */
+      .aurele-contact {
+        padding: var(--section-gap) 0;
+        position: relative;
+      }
+
+      .aurele-contact::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: -10%;
+        width: 40%;
+        height: 60%;
+        background: radial-gradient(ellipse, var(--accent-warm-glow) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .aurele-contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 4rem;
+      }
+
+      .aurele-contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+      }
+
+      .aurele-contact-detail {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .aurele-contact-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent-warm-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-warm);
+        flex-shrink: 0;
+      }
+
+      .aurele-contact-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .aurele-contact-detail-text h4 {
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .aurele-contact-detail-text p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .aurele-contact-hours {
+        margin-top: 1rem;
+        padding: 1.75rem;
+      }
+
+      .aurele-contact-hours h4 {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+      }
+
+      .aurele-hours-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--surface-glass-border);
+      }
+
+      .aurele-hours-row:last-child {
+        border-bottom: none;
+      }
+
+      .aurele-hours-day {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
+      .aurele-hours-time {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--text-primary);
+      }
+
+      /* Contact form */
+      .aurele-contact-form-wrapper {
+        padding: 2.5rem;
+      }
+
+      .aurele-contact-form-wrapper h3 {
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+      }
+
+      .aurele-contact-form-wrapper>p {
+        font-size: 0.9375rem;
+        color: var(--text-tertiary);
+        margin-bottom: 2rem;
+      }
+
+      .aurele-form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .aurele-form-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.02em;
+      }
+
+      .aurele-form-input,
+      .aurele-form-textarea {
+        width: 100%;
+        padding: 0.875rem 1.125rem;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-glass-border);
+        border-radius: 0.875rem;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .aurele-form-input::placeholder,
+      .aurele-form-textarea::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      .aurele-form-input:focus,
+      .aurele-form-textarea:focus {
+        border-color: var(--accent-warm);
+        box-shadow: 0 0 0 3px var(--accent-warm-muted);
+      }
+
+      .aurele-form-textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .aurele-form-submit {
+        width: 100%;
+        padding: 1rem;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--canvas-deep);
+        background: var(--accent-warm);
+        border: none;
+        border-radius: 0.875rem;
+        cursor: pointer;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+        margin-top: 0.5rem;
+      }
+
+      .aurele-form-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px -8px rgba(212, 165, 116, 0.3);
+      }
+
+      .aurele-form-submit:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* Success message */
+      .aurele-form-success {
+        display: none;
+        text-align: center;
+        padding: 3rem 1rem;
+      }
+
+      .aurele-form-success.aurele-success-show {
+        display: block;
+      }
+
+      .aurele-form-success svg {
+        width: 48px;
+        height: 48px;
+        color: var(--accent-warm);
+        margin-bottom: 1rem;
+      }
+
+      .aurele-form-success h4 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .aurele-form-success p {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+      }
+
+      /* ============================================
+           FOOTER
+           ============================================ */
+      .aurele-footer {
+        border-top: 1px solid var(--surface-glass-border);
+        padding: 3rem 0;
+        margin-top: 2rem;
+      }
+
+      .aurele-footer-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .aurele-footer-brand {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        color: var(--text-primary);
+      }
+
+      .aurele-footer-brand span {
+        color: var(--accent-warm);
+      }
+
+      .aurele-footer-copyright {
+        font-size: 0.8125rem;
+        color: var(--text-tertiary);
+      }
+
+      .aurele-footer-socials {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .aurele-social-link {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--surface-glass);
+        border: 1px solid var(--surface-glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .aurele-social-link:hover {
+        background: var(--accent-warm-muted);
+        border-color: var(--accent-warm);
+        color: var(--accent-warm);
+        transform: translateY(-2px);
+      }
+
+      .aurele-social-link svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* ============================================
+           KEYFRAME ANIMATIONS
+           ============================================ */
+      @keyframes aurele-fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes aurele-scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.92);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Gentle float for decorative elements */
+      @keyframes aurele-float {
+
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      /* ============================================
+           RESPONSIVE — MOBILE FIRST COLLAPSE
+           ============================================ */
+      @media (max-width: 1024px) {
+        .aurele-menu-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .aurele-contact-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .aurele-gallery-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .aurele-gallery-item:nth-child(1) {
+          grid-column: span 2;
+          grid-row: span 1;
+          aspect-ratio: 16/9;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .aurele-nav-links {
+          display: none;
+        }
+
+        .aurele-nav-toggle {
+          display: flex;
+        }
+
+        .aurele-hero {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+
+        .aurele-hero-content {
+          padding: 8rem var(--container-pad) 3rem;
+          text-align: left;
+        }
+
+        .aurele-hero-visual {
+          padding: 0 var(--container-pad) 3rem;
+        }
+
+        .aurele-hero-image-wrapper {
+          width: 100%;
+          max-width: none;
+          aspect-ratio: 4/3;
+        }
+
+        .aurele-hero-badge {
+          position: relative;
+          bottom: auto;
+          left: auto;
+          margin-top: 1.5rem;
+        }
+
+        .aurele-about-grid {
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+
+        .aurele-about-image {
+          order: -1;
+          aspect-ratio: 16/9;
+        }
+
+        .aurele-about-stats {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+
+        .aurele-menu-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .aurele-dish-card {
+          grid-template-columns: 64px 1fr;
+          gap: 1rem;
+          padding: 1.5rem;
+        }
+
+        .aurele-dish-image {
+          width: 64px;
+          height: 64px;
+        }
+
+        .aurele-dish-price {
+          grid-column: 2;
+          align-self: auto;
+          margin-top: 0;
+        }
+
+        .aurele-gallery-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 0.75rem;
+        }
+
+        .aurele-gallery-item:nth-child(1) {
+          grid-column: span 2;
+        }
+
+        .aurele-contact-grid {
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+
+        .aurele-footer-inner {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .aurele-hero-title {
+          font-size: clamp(2.25rem, 10vw, 3.5rem);
+        }
+
+        .aurele-about-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .aurele-stat-card {
+          text-align: left;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem 1.25rem;
+        }
+
+        .aurele-stat-number {
+          margin-bottom: 0;
+          font-size: 2rem;
+        }
+
+        .aurele-gallery-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .aurele-gallery-item:nth-child(1) {
+          grid-column: span 1;
+        }
+
+        .aurele-menu-filters {
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          padding-bottom: 0.5rem;
+        }
+
+        .aurele-filter-btn {
+          flex-shrink: 0;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>klar-restaurant</h1>
-    <p>Edit this page with Klar.</p>
+
+    <!-- ==========================================
+         NAVIGATION — Fixed glass nav with scroll effect
+         ========================================== -->
+    <nav class="aurele-nav" id="aureleNav">
+      <div class="aurele-container aurele-nav-inner">
+        <a href="#" class="aurele-nav-logo">Maison <span>Aurèle</span></a>
+
+        <ul class="aurele-nav-links">
+          <li><a href="#aurele-about">About</a></li>
+          <li><a href="#aurele-menu">Menu</a></li>
+          <li><a href="#aurele-gallery">Gallery</a></li>
+          <li><a href="#aurele-contact">Contact</a></li>
+        </ul>
+
+        <!-- Mobile toggle button -->
+        <button class="aurele-nav-toggle" id="aureleNavToggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile full-screen menu overlay -->
+    <div class="aurele-mobile-menu" id="aureleMobileMenu">
+      <a href="#aurele-about" class="aurele-mobile-link">About</a>
+      <a href="#aurele-menu" class="aurele-mobile-link">Menu</a>
+      <a href="#aurele-gallery" class="aurele-mobile-link">Gallery</a>
+      <a href="#aurele-contact" class="aurele-mobile-link">Contact</a>
+    </div>
+
+    <!-- ==========================================
+         HERO SECTION — Asymmetric split layout
+         ========================================== -->
+    <section class="aurele-hero" id="aurele-hero">
+      <div class="aurele-hero-content">
+        <p class="aurele-hero-tagline">Est. 2017 — Bordeaux, France</p>
+        <h1 class="aurele-hero-title">
+          Where fire<br>meets <em>finesse</em>
+        </h1>
+        <p class="aurele-hero-subtitle">
+          A deeply personal kitchen rooted in seasonal French technique,
+          shaped by the open flame and the rhythm of the land.
+        </p>
+        <a href="#aurele-contact" class="aurele-hero-cta">
+          Book a Table
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="aurele-hero-visual">
+        <div class="aurele-hero-image-wrapper">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=1000&fit=crop&q=80"
+            alt="Elegant plated dish at Maison Aurèle" loading="eager">
+        </div>
+
+        <!-- Floating glass badge -->
+        <div class="aurele-hero-badge">
+          <div class="aurele-hero-badge-inner">
+            <div class="aurele-hero-badge-icon">★</div>
+            <div class="aurele-hero-badge-text">
+              <strong>Michelin Recognized</strong>
+              <span>Since 2019</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         ABOUT SECTION — Glass card with stats
+         ========================================== -->
+    <section class="aurele-about" id="aurele-about">
+      <div class="aurele-container">
+        <div class="aurele-about-grid">
+          <div class="aurele-about-text aurele-reveal">
+            <p class="aurele-section-label">Our Story</p>
+            <h2 class="aurele-section-heading">Rooted in craft,<br>driven by curiosity</h2>
+            <p>
+              Maison Aurèle was born from Chef Laurent Marchand's obsession
+              with fire-driven cooking and the farmers who shape our terroir.
+              Every plate tells the story of a particular morning at the market,
+              a conversation with a winemaker, or a childhood memory from Périgord.
+            </p>
+            <p>
+              We do not chase trends. We chase honesty — in sourcing, in technique,
+              and in the hospitality we extend to every guest who walks through our doors.
+            </p>
+
+            <div class="aurele-about-stats aurele-stagger">
+              <div class="aurele-glass-card aurele-stat-card">
+                <div class="aurele-stat-number">7</div>
+                <div class="aurele-stat-label">Years Open</div>
+              </div>
+              <div class="aurele-glass-card aurele-stat-card">
+                <div class="aurele-stat-number">24</div>
+                <div class="aurele-stat-label">Seats Nightly</div>
+              </div>
+              <div class="aurele-glass-card aurele-stat-card">
+                <div class="aurele-stat-number">12</div>
+                <div class="aurele-stat-label">Local Farms</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="aurele-about-image aurele-reveal">
+            <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&h=900&fit=crop&q=80"
+              alt="Chef preparing a dish over open flame" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         MENU SECTION — Filterable dish cards
+         ========================================== -->
+    <section class="aurele-menu" id="aurele-menu">
+      <div class="aurele-container">
+        <div class="aurele-menu-header aurele-reveal">
+          <div>
+            <p class="aurele-section-label">The Menu</p>
+            <h2 class="aurele-section-heading">Seasonal plates,<br>lasting impressions</h2>
+          </div>
+
+          <!-- Filter buttons for interactive menu filtering -->
+          <div class="aurele-menu-filters" id="aureleMenuFilters">
+            <button class="aurele-filter-btn aurele-filter-active" data-filter="all">All</button>
+            <button class="aurele-filter-btn" data-filter="starter">Starters</button>
+            <button class="aurele-filter-btn" data-filter="main">Mains</button>
+            <button class="aurele-filter-btn" data-filter="dessert">Desserts</button>
+          </div>
+        </div>
+
+        <div class="aurele-menu-grid aurele-stagger" id="aureleMenuGrid">
+
+          <!-- Dish 1 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="starter">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=200&fit=crop&q=80"
+                alt="Cured trout on plate" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Cured River Trout</h3>
+              <p class="aurele-dish-desc">Citrus, fennel pollen, buttermilk, dill oil</p>
+              <span class="aurele-dish-tag">Starter</span>
+            </div>
+            <span class="aurele-dish-price">€18</span>
+          </div>
+
+          <!-- Dish 2 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="starter">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=200&h=200&fit=crop&q=80"
+                alt="Burrata with heirloom tomatoes" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Heirloom Tomato Salad</h3>
+              <p class="aurele-dish-desc">Burrata, aged balsamic, basil, black garlic</p>
+              <span class="aurele-dish-tag">Starter</span>
+            </div>
+            <span class="aurele-dish-price">€16</span>
+          </div>
+
+          <!-- Dish 3 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="main">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=200&h=200&fit=crop&q=80"
+                alt="Dry-aged duck breast" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Dry-aged Duck Breast</h3>
+              <p class="aurele-dish-desc">Cherry jus, roasted turnip, smoked hazelnut</p>
+              <span class="aurele-dish-tag">Main</span>
+            </div>
+            <span class="aurele-dish-price">€38</span>
+          </div>
+
+          <!-- Dish 4 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="main">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1432139509613-5c4255a1d9be?w=200&h=200&fit=crop&q=80"
+                alt="Wild sea bass fillet" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Wild Sea Bass</h3>
+              <p class="aurele-dish-desc">Saffron beurre blanc, asparagus, sea herbs</p>
+              <span class="aurele-dish-tag">Main</span>
+            </div>
+            <span class="aurele-dish-price">€42</span>
+          </div>
+
+          <!-- Dish 5 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="main">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop&q=80"
+                alt="Braised lamb shoulder" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Braised Lamb Shoulder</h3>
+              <p class="aurele-dish-desc">Olive tapenade, charred eggplant, rosemary jus</p>
+              <span class="aurele-dish-tag">Main</span>
+            </div>
+            <span class="aurele-dish-price">€36</span>
+          </div>
+
+          <!-- Dish 6 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="dessert">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=200&h=200&fit=crop&q=80"
+                alt="Dark chocolate mousse" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Valrhona Chocolate Mousse</h3>
+              <p class="aurele-dish-desc">Tonka bean, candied orange, cocoa nib tuile</p>
+              <span class="aurele-dish-tag">Dessert</span>
+            </div>
+            <span class="aurele-dish-price">€14</span>
+          </div>
+
+          <!-- Dish 7 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="dessert">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&h=200&fit=crop&q=80"
+                alt="Tarte Tatin" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Tarte Tatin</h3>
+              <p class="aurele-dish-desc">Caramelized apple, calvados cream, vanilla</p>
+              <span class="aurele-dish-tag">Dessert</span>
+            </div>
+            <span class="aurele-dish-price">€13</span>
+          </div>
+
+          <!-- Dish 8 -->
+          <div class="aurele-glass-card aurele-dish-card" data-category="starter">
+            <div class="aurele-dish-image">
+              <img src="https://images.unsplash.com/photo-1607098665874-fd193397547b?w=200&h=200&fit=crop&q=80"
+                alt="Foie gras terrine" loading="lazy">
+            </div>
+            <div class="aurele-dish-info">
+              <h3 class="aurele-dish-name">Foie Gras Terrine</h3>
+              <p class="aurele-dish-desc">Sauternes gel, brioche, Périgord walnut</p>
+              <span class="aurele-dish-tag">Starter</span>
+            </div>
+            <span class="aurele-dish-price">€26</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         GALLERY SECTION — Asymmetric bento grid
+         ========================================== -->
+    <section class="aurele-gallery" id="aurele-gallery">
+      <div class="aurele-container">
+        <div class="aurele-gallery-header aurele-reveal">
+          <p class="aurele-section-label">The Atmosphere</p>
+          <h2 class="aurele-section-heading">An evening at Maison Aurèle</h2>
+        </div>
+
+        <div class="aurele-gallery-grid aurele-stagger" id="aureleGalleryGrid">
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=800&fit=crop&q=80"
+              alt="Restaurant interior with warm lighting" loading="lazy">
+          </div>
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=400&fit=crop&q=80"
+              alt="Chef plating a dish" loading="lazy">
+          </div>
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=400&h=400&fit=crop&q=80"
+              alt="Wine being poured at table" loading="lazy">
+          </div>
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&h=400&fit=crop&q=80"
+              alt="Table setting with candles" loading="lazy">
+          </div>
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1428515613728-6b4607e44363?w=400&h=400&fit=crop&q=80"
+              alt="Open kitchen with fire" loading="lazy">
+          </div>
+          <div class="aurele-gallery-item">
+            <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=400&h=400&fit=crop&q=80"
+              alt="Fresh ingredients on counter" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         CONTACT SECTION — Info + Glass Form
+         ========================================== -->
+    <section class="aurele-contact" id="aurele-contact">
+      <div class="aurele-container">
+        <div class="aurele-contact-grid">
+          <div class="aurele-contact-info aurele-reveal">
+            <div>
+              <p class="aurele-section-label">Get in Touch</p>
+              <h2 class="aurele-section-heading">We'd love to<br>welcome you</h2>
+            </div>
+
+            <div class="aurele-contact-detail">
+              <div class="aurele-contact-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <div class="aurele-contact-detail-text">
+                <h4>Location</h4>
+                <p>14 Rue Sainte-Catherine<br>33000 Bordeaux, France</p>
+              </div>
+            </div>
+
+            <div class="aurele-contact-detail">
+              <div class="aurele-contact-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path
+                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                </svg>
+              </div>
+              <div class="aurele-contact-detail-text">
+                <h4>Reservations</h4>
+                <p>+33 5 56 81 47 23</p>
+              </div>
+            </div>
+
+            <div class="aurele-contact-detail">
+              <div class="aurele-contact-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div class="aurele-contact-detail-text">
+                <h4>Email</h4>
+                <p>bonjour@maison-aurele.fr</p>
+              </div>
+            </div>
+
+            <!-- Opening hours card -->
+            <div class="aurele-glass-card aurele-contact-hours">
+              <h4>Opening Hours</h4>
+              <div class="aurele-hours-row">
+                <span class="aurele-hours-day">Tuesday — Thursday</span>
+                <span class="aurele-hours-time">18:30 — 22:00</span>
+              </div>
+              <div class="aurele-hours-row">
+                <span class="aurele-hours-day">Friday — Saturday</span>
+                <span class="aurele-hours-time">18:00 — 23:00</span>
+              </div>
+              <div class="aurele-hours-row">
+                <span class="aurele-hours-day">Sunday Lunch</span>
+                <span class="aurele-hours-time">12:00 — 14:30</span>
+              </div>
+              <div class="aurele-hours-row">
+                <span class="aurele-hours-day">Monday</span>
+                <span class="aurele-hours-time">Closed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact form in a glass card -->
+          <div class="aurele-glass-card aurele-contact-form-wrapper aurele-reveal">
+            <h3>Send a Message</h3>
+            <p>For private events, inquiries, or just to say hello.</p>
+
+            <form id="aureleContactForm">
+              <div class="aurele-form-group">
+                <label class="aurele-form-label" for="aureleFormName">Your Name</label>
+                <input class="aurele-form-input" type="text" id="aureleFormName" placeholder="Laurent Marchand"
+                  required>
+              </div>
+              <div class="aurele-form-group">
+                <label class="aurele-form-label" for="aureleFormEmail">Email Address</label>
+                <input class="aurele-form-input" type="email" id="aureleFormEmail" placeholder="laurent@example.fr"
+                  required>
+              </div>
+              <div class="aurele-form-group">
+                <label class="aurele-form-label" for="aureleFormMessage">Message</label>
+                <textarea class="aurele-form-textarea" id="aureleFormMessage"
+                  placeholder="Tell us about your occasion..." required></textarea>
+              </div>
+              <button type="submit" class="aurele-form-submit">Send Message</button>
+            </form>
+
+            <!-- Success state shown after form submission -->
+            <div class="aurele-form-success" id="aureleFormSuccess">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <h4>Message Sent</h4>
+              <p>Thank you. We'll be in touch within 24 hours.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="aurele-footer">
+      <div class="aurele-container aurele-footer-inner">
+        <div class="aurele-footer-brand">
+          Maison <span>Aurèle</span>
+        </div>
+
+        <p class="aurele-footer-copyright">
+          &copy; 2024 Maison Aurèle. All rights reserved.
+        </p>
+
+        <div class="aurele-footer-socials">
+          <!-- Instagram -->
+          <a href="#" class="aurele-social-link" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+          <!-- Facebook -->
+          <a href="#" class="aurele-social-link" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+            </svg>
+          </a>
+          <!-- Twitter/X -->
+          <a href="#" class="aurele-social-link" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M4 4l11.733 16h4.267l-11.733-16zM4 20l6.768-6.768M13.232 10.232L20 4" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ==========================================
+         JAVASCRIPT — Interactions & Animations
+         ========================================== -->
+    <script>
+      (function() {
+        'use strict';
+
+        /* ============================================
+           1. NAVBAR SCROLL EFFECT
+           Adds glass background when scrolled
+           ============================================ */
+        const nav = document.getElementById('aureleNav');
+        let lastScroll = 0;
+
+        function handleNavScroll() {
+          const scrollY = window.scrollY;
+          if (scrollY > 60) {
+            nav.classList.add('aurele-nav-scrolled');
+          } else {
+            nav.classList.remove('aurele-nav-scrolled');
+          }
+          lastScroll = scrollY;
+        }
+
+        window.addEventListener('scroll', handleNavScroll, {
+          passive: true
+        });
+
+        /* ============================================
+           2. MOBILE MENU TOGGLE
+           ============================================ */
+        const navToggle = document.getElementById('aureleNavToggle');
+        const mobileMenu = document.getElementById('aureleMobileMenu');
+        const mobileLinks = document.querySelectorAll('.aurele-mobile-link');
+
+        navToggle.addEventListener('click', function() {
+          this.classList.toggle('aurele-toggle-active');
+          mobileMenu.classList.toggle('aurele-menu-open');
+          document.body.style.overflow = mobileMenu.classList.contains('aurele-menu-open') ? 'hidden' : '';
+        });
+
+        // Close mobile menu when a link is clicked
+        mobileLinks.forEach(function(link) {
+          link.addEventListener('click', function() {
+            navToggle.classList.remove('aurele-toggle-active');
+            mobileMenu.classList.remove('aurele-menu-open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        /* ============================================
+           3. SCROLL REVEAL — IntersectionObserver
+           Animates elements as they enter the viewport
+           ============================================ */
+        const revealElements = document.querySelectorAll('.aurele-reveal, .aurele-stagger');
+
+        const revealObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('aurele-visible');
+
+              // Apply staggered delays to children
+              if (entry.target.classList.contains('aurele-stagger')) {
+                const children = entry.target.children;
+                Array.from(children).forEach(function(child, index) {
+                  child.style.transitionDelay = (index * 100) + 'ms';
+                });
+              }
+
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.15,
+          rootMargin: '0px 0px -60px 0px'
+        });
+
+        revealElements.forEach(function(el) {
+          revealObserver.observe(el);
+        });
+
+        /* ============================================
+           4. MENU FILTERING
+           Interactive category filter for dishes
+           ============================================ */
+        const filterBtns = document.querySelectorAll('.aurele-filter-btn');
+        const dishCards = document.querySelectorAll('.aurele-dish-card');
+
+        filterBtns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            // Update active state
+            filterBtns.forEach(function(b) {
+              b.classList.remove('aurele-filter-active');
+            });
+            this.classList.add('aurele-filter-active');
+
+            const filter = this.getAttribute('data-filter');
+
+            dishCards.forEach(function(card, index) {
+              const category = card.getAttribute('data-category');
+              const shouldShow = filter === 'all' || category === filter;
+
+              if (shouldShow) {
+                card.classList.remove('aurele-dish-hidden');
+                // Re-trigger stagger animation
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(function() {
+                  card.style.transition =
+                    'opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+                  card.style.transitionDelay = (index * 80) + 'ms';
+                  card.style.opacity = '1';
+                  card.style.transform = 'translateY(0)';
+                }, 10);
+              } else {
+                card.classList.add('aurele-dish-hidden');
+              }
+            });
+          });
+        });
+
+        /* ============================================
+           5. CONTACT FORM SUBMISSION
+           Simple validation + success state
+           ============================================ */
+        const contactForm = document.getElementById('aureleContactForm');
+        const formSuccess = document.getElementById('aureleFormSuccess');
+
+        contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          // Simulate form submission
+          const submitBtn = contactForm.querySelector('.aurele-form-submit');
+          submitBtn.textContent = 'Sending...';
+          submitBtn.disabled = true;
+
+          setTimeout(function() {
+            contactForm.style.display = 'none';
+            formSuccess.classList.add('aurele-success-show');
+          }, 1200);
+        });
+
+        /* ============================================
+           6. SMOOTH PARALLAX ON HERO BADGE
+           Subtle floating effect on scroll
+           ============================================ */
+        const heroBadge = document.querySelector('.aurele-hero-badge');
+
+        function handleParallax() {
+          if (!heroBadge) return;
+          const scrollY = window.scrollY;
+          const offset = scrollY * 0.15;
+          heroBadge.style.transform = 'translateY(' + (-offset) + 'px)';
+        }
+
+        window.addEventListener('scroll', handleParallax, {
+          passive: true
+        });
+
+        /* ============================================
+           7. GALLERY ITEM TILT ON HOVER
+           Subtle 3D perspective tilt effect
+           ============================================ */
+        const galleryItems = document.querySelectorAll('.aurele-gallery-item');
+
+        galleryItems.forEach(function(item) {
+          item.addEventListener('mousemove', function(e) {
+            const rect = item.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / centerY * -3;
+            const rotateY = (x - centerX) / centerX * 3;
+
+            item.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY +
+              'deg) scale(1.02)';
+            item.style.transition = 'transform 0.1s ease';
+          });
+
+          item.addEventListener('mouseleave', function() {
+            item.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale(1)';
+            item.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+          });
+        });
+
+        /* ============================================
+           8. CTA BUTTON RIPPLE EFFECT
+           Creates an expanding ripple on click
+           ============================================ */
+        const ctaButton = document.querySelector('.aurele-hero-cta');
+
+        if (ctaButton) {
+          ctaButton.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = ctaButton.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);' +
+              'width:' + size + 'px;height:' + size + 'px;left:' + x + 'px;top:' + y + 'px;' +
+              'transform:scale(0);animation:aurele-ripple 0.6s ease-out;pointer-events:none;';
+
+            ctaButton.style.position = 'relative';
+            ctaButton.style.overflow = 'hidden';
+            ctaButton.appendChild(ripple);
+
+            setTimeout(function() {
+              ripple.remove();
+            }, 700);
+          });
+
+          // Inject ripple keyframe
+          const style = document.createElement('style');
+          style.textContent = '@keyframes aurele-ripple{to{transform:scale(4);opacity:0;}}';
+          document.head.appendChild(style);
+        }
+
+      })();
+    </script>
+
   </body>
 </html>
